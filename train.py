@@ -11,26 +11,26 @@ model.train(samples,responses)
 
 ############################# testing part  #########################
 
-im = cv2.imread('pi.png')
+im = cv2.imread('tt.png')
 out = np.zeros(im.shape,np.uint8)
 gray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
-cv2.imshow('in', gray)
-key = cv2.waitKey(0)
-thresh = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-#thresh = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-#ret, thresh = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
-#cv2.imshow('in', thresh)
-#key = cv2.waitKey(0)
+thresh = cv2.adaptiveThreshold(gray,255,1,1,11,2)
+
+contours_,hierarchy_ = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+[_,_,_,h] = cv2.boundingRect(contours_[0])
+h_min = h;
+for cnt in contours_:
+    #if cv2.contourArea(cnt)>50:
+        [x,y,w,h] = cv2.boundingRect(cnt)
+        if h < h_min: h_min = h
+print h_min
 
 contours,hierarchy = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-cv2.drawContours(im,contours,-1,(0,0,255),3)
-cv2.imshow('in', thresh)
-key = cv2.waitKey(0)
 
 for cnt in contours:
-    if cv2.contourArea(cnt)>50:
+    #if cv2.contourArea(cnt)>50:
         [x,y,w,h] = cv2.boundingRect(cnt)
-        if  h>28:
+        if  h>=h_min:
             cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
             roi = thresh[y:y+h,x:x+w]
             roismall = cv2.resize(roi,(10,10))
@@ -41,5 +41,7 @@ for cnt in contours:
             cv2.putText(out,string,(x,y+h),0,1,(0,255,0))
 
 cv2.imshow('im',im)
+cv2.imwrite("ttt.png", im)
 cv2.imshow('out',out)
+cv2.imwrite("ttt1.png", out)
 cv2.waitKey(0)
